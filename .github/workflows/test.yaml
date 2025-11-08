@@ -2,10 +2,12 @@ name: test
 on: [push, workflow_dispatch]
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          submodules: recursive
 
       - name: Install iverilog
         shell: bash
@@ -42,4 +44,5 @@ jobs:
           name: test-vcd
           path: |
             test/tb.vcd
-            test/result.xml
+            test/results.xml
+            test/output/*
