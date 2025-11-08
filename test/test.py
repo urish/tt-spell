@@ -21,7 +21,7 @@ async def reset(dut):
 @cocotb.test()
 async def test_add(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -41,7 +41,7 @@ async def test_add(dut):
 @cocotb.test()
 async def test_sub(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -56,7 +56,7 @@ async def test_sub(dut):
 @cocotb.test()
 async def test_bitwise(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -77,7 +77,7 @@ async def test_bitwise(dut):
 @cocotb.test()
 async def test_dup(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -96,7 +96,7 @@ async def test_dup(dut):
 @cocotb.test()
 async def test_exchange(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -115,7 +115,7 @@ async def test_exchange(dut):
 @cocotb.test()
 async def test_jmp(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -130,7 +130,7 @@ async def test_jmp(dut):
 @cocotb.test()
 async def test_loop(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -161,7 +161,7 @@ async def test_delay(dut):
     delay_ms_cycles = 10000  # Hardcoded value for now
 
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -180,7 +180,7 @@ async def test_delay(dut):
 @cocotb.test()
 async def test_sleep(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -195,7 +195,7 @@ async def test_sleep(dut):
 @cocotb.test()
 async def test_stop(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -210,7 +210,7 @@ async def test_stop(dut):
 @cocotb.test()
 async def test_code_mem_read(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -225,7 +225,7 @@ async def test_code_mem_read(dut):
 @cocotb.test()
 async def test_code_mem_write(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -240,7 +240,7 @@ async def test_code_mem_write(dut):
 @cocotb.test()
 async def test_code_mem_init_0xff(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -255,7 +255,7 @@ async def test_code_mem_init_0xff(dut):
 @cocotb.test()
 async def test_code_mem_all_bytes(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -286,7 +286,7 @@ async def test_code_mem_all_bytes(dut):
 @cocotb.test()
 async def test_data_mem(dut):
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -305,30 +305,30 @@ async def test_porta(dut):
     PORTA = 0x3B
 
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
-    assert dut.uo_out.value & 0xF0 == 0x00
+    assert int(dut.uo_out.value) & 0xF0 == 0x00
     await spell.push(0xC6)
     await spell.push(PORTA)
     await spell.exec_opcode("w")
-    assert dut.uo_out.value & 0xF0 == 0x00
+    assert int(dut.uo_out.value) & 0xF0 == 0x00
 
     await spell.push(0xFF)
     await spell.push(DDRA)
     await spell.exec_opcode("w")
-    assert dut.uo_out.value == 0xC6
+    assert int(dut.uo_out.value) == 0xC6
 
     await spell.push(0xF0)
     await spell.push(DDRA)
     await spell.exec_opcode("w")
-    assert dut.uo_out.value & 0xF0 == 0xC0
+    assert int(dut.uo_out.value) & 0xF0 == 0xC0
 
     await spell.push(0x80)
     await spell.push(PINA)
     await spell.exec_opcode("w")
-    assert dut.uo_out.value & 0xF0 == 0x40
+    assert int(dut.uo_out.value) & 0xF0 == 0x40
 
 
 @cocotb.test()
@@ -338,7 +338,7 @@ async def test_portb(dut):
     PORTB = 0x38
 
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -369,7 +369,7 @@ async def test_io_pin_reg(dut):
     PINB = 0x36
 
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 
@@ -384,7 +384,7 @@ async def test_intg_multiply(dut):
     SPELL integration test: multiplies two numbers
     """
     spell = SpellController(dut)
-    clock = Clock(dut.clk, 10, units="us")
+    clock = Clock(dut.clk, 10, unit="us")
     cocotb.start_soon(clock.start())
     await reset(dut)
 

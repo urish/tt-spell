@@ -27,18 +27,6 @@ module tt_um_urish_spell (
   localparam REG_EXEC = 2'd2;
   localparam REG_STACK_TOP = 2'd3;
 
-  wire o_sleep = state == StateSleep;
-  wire o_stop = state == StateStop || state == StateSleep;
-  wire o_wait_delay = state == StateDelay;
-  reg o_shift_out;
-
-  wire [7:0] porta_oe;
-  wire [7:0] porta_out;
-  assign uo_out = (
-    (~porta_oe & {4'b0000, o_shift_out, o_wait_delay, o_stop, o_sleep})
-    | (porta_oe & porta_out)
-  );
-
   wire i_run = ui_in[0];
   wire i_step = ui_in[1];
   wire i_load = ui_in[2];
@@ -66,6 +54,18 @@ module tt_um_urish_spell (
   wire [7:0] delay_amount;
   wire sleep;
   wire stop;
+
+  wire o_sleep = state == StateSleep;
+  wire o_stop = state == StateStop || state == StateSleep;
+  wire o_wait_delay = state == StateDelay;
+  reg o_shift_out;
+
+  wire [7:0] porta_oe;
+  wire [7:0] porta_out;
+  assign uo_out = (
+    (~porta_oe & {4'b0000, o_shift_out, o_wait_delay, o_stop, o_sleep})
+    | (porta_oe & porta_out)
+  );
 
   // shift register for loading data / dumping debug info
   reg [7:0] shift_reg;

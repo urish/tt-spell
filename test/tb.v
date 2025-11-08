@@ -18,7 +18,6 @@ module tb ();
   reg clk;
   reg rst_n;
   reg ena;
-  wire [7:0] ui_in = {1'b0, i_reg_sel, i_shift_in, i_dump, i_load, i_step, i_run};
   reg [7:0] uio_in;
   wire [7:0] uo_out;
   wire [7:0] uio_out;
@@ -30,6 +29,7 @@ module tb ();
   reg i_dump;
   reg i_shift_in;
   reg [1:0] i_reg_sel;
+  wire [7:0] ui_in = {1'b0, i_reg_sel, i_shift_in, i_dump, i_load, i_step, i_run};
 
   wire o_cpu_sleep = uo_out[0];
   wire o_cpu_stop = uo_out[1];

@@ -47,7 +47,7 @@ class SpellController:
         value = 0
         for i in range(8):
             await ClockCycles(self._dut.clk, 1)
-            value |= self._dut.o_shift_out.value << (7 - i)
+            value |= int(self._dut.o_shift_out.value) << (7 - i)
         return value
 
     async def execute(self, wait=True):
