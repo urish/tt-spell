@@ -36,13 +36,18 @@ module tb ();
   wire o_cpu_wait_delay = uo_out[2];
   wire o_shift_out = uo_out[3];
 
+`ifdef GL_TEST
+  wire VPWR = 1'b1;
+  wire VGND = 1'b0;
+`endif
+
   // Replace tt_um_example with your module name:
   tt_um_urish_spell user_project (
 
       // Include power ports for the Gate Level test:
 `ifdef GL_TEST
-      .VPWR(1'b1),
-      .VGND(1'b0),
+      .VPWR(VPWR),
+      .VGND(VGND),
 `endif
 
       .ui_in  (ui_in),    // Dedicated inputs
