@@ -27,6 +27,34 @@
   "RUN_LINTER": 1,
   "LINTER_INCLUDE_PDK_MODELS": 1,
 
+  "//": "Macro",
+  "MACROS": {
+    "rf_top": {
+      "instances": {
+        "mem.mem_internal.code_mem_lo": {
+          "location": [3, 45.0],
+          "orientation": "E"
+        },
+        "mem.mem_internal.code_mem_hi": {
+          "location": [200, 45.0],
+          "orientation": "E"
+        }
+      },
+      "gds": ["dir::../macros/rf_top.gds.gz"],
+      "lef": ["dir::../macros/rf_top.lef"],
+      "lib": {
+        "*": ["dir::../macros/rf_top.lib"]
+      }
+    }
+  },
+
+  "PDN_MACRO_CONNECTIONS": [
+    "mem.mem_internal.code_mem_lo VPWR VGND VDPWR VGND",
+    "mem.mem_internal.code_mem_hi VPWR VGND VDPWR VGND"
+  ],
+
+  "FP_PDN_HORIZONTAL_LAYER": "met3",
+
   "//": "If you need a custom clock configuration, read the following documentation first:",
   "//": "https://tinytapeout.com/faq/#how-can-i-map-an-additional-external-clock-to-one-of-the-gpios",
   "CLOCK_PORT": "clk",

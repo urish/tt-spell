@@ -26,7 +26,8 @@ module spell_mem_internal (
   wire [4:0] code_mem_addr = code_mem_ready ? addr[6:2] : code_mem_init_addr;
   wire [31:0] code_mem_lo_do;
   wire [31:0] code_mem_hi_do;
-  wire [31:0] code_mem_di = code_mem_ready ? {data_in, data_in, data_in, data_in} : 32'hffffffff;
+  reg [31:0] data_in_dword;
+  wire [31:0] code_mem_di = code_mem_ready ? data_in_dword : 32'hffffffff;
   wire [31:0] code_mem_do = code_mem_lo_sel ? code_mem_lo_do : code_mem_hi_do;
 
   wire [4:0] word_index = {addr[1:0], 3'b000};
@@ -37,44 +38,54 @@ module spell_mem_internal (
 
 
   wire we = select && write;
-  wire [3:0] we_sel = we ? (1 << addr[1:0]) : 0;
-  wire [3:0] code_mem_we0 = code_mem_ready ? we_sel : 4'b1111;
+  reg  prev_we;
 
-  RAM32 code_mem_lo (
-      .CLK(clk),
-      .EN0(rst_n),
-      .WE0(code_mem_lo_sel || !code_mem_ready ? code_mem_we0 : 4'b0000),
-      .A0 (code_mem_addr),
-      .Di0(code_mem_di),
-      .Do0(code_mem_lo_do)
+  rf_top code_mem_lo (
+      .clk(clk),
+      .w_addr(code_mem_addr),
+      .w_data(code_mem_di),
+      .w_ena(~code_mem_ready || (we && code_mem_lo_sel)),
+      .ra_addr(code_mem_addr),
+      .ra_data(code_mem_lo_do),
+      .rb_addr(5'b0)
   );
 
-  RAM32 code_mem_hi (
-      .CLK(clk),
-      .EN0(rst_n),
-      .WE0(code_mem_hi_sel || !code_mem_ready ? code_mem_we0 : 4'b0000),
-      .A0 (code_mem_addr),
-      .Di0(code_mem_di),
-      .Do0(code_mem_hi_do)
+  rf_top code_mem_hi (
+      .clk(clk),
+      .w_addr(code_mem_addr),
+      .w_data(code_mem_di),
+      .w_ena(~code_mem_ready || (we && code_mem_hi_sel)),
+      .ra_addr(code_mem_addr),
+      .ra_data(code_mem_hi_do),
+      .rb_addr(5'b0)
   );
 
   localparam data_mem_bits = $clog2(data_mem_size);
   reg [7:0] data_mem[data_mem_size-1:0];
   wire [data_mem_bits-1:0] data_addr = addr[data_mem_bits-1:0];
 
-  reg [1:0] cycles;
+  always @(*) begin
+    case (addr[1:0])
+      2'b00: data_in_dword = {code_mem_do[31:8], data_in};
+      2'b01: data_in_dword = {code_mem_do[31:16], data_in, code_mem_do[7:0]};
+      2'b10: data_in_dword = {code_mem_do[31:24], data_in, code_mem_do[15:0]};
+      2'b11: data_in_dword = {data_in, code_mem_do[23:0]};
+    endcase
+  end
 
   integer i;
 
   always @(posedge clk) begin
     if (~rst_n) begin
-      cycles <= 0;
-      data_ready <= 0;
+      data_ready   <= 0;
       data_mem_out <= 0;
       for (i = 0; i < data_mem_size; i++) data_mem[i] <= 8'h00;
       code_mem_ready <= 0;
       code_mem_init_addr <= 0;
+      prev_we <= 1'b0;
     end else begin
+      prev_we <= we;
+
       if (!code_mem_ready) begin
         code_mem_init_addr <= code_mem_init_addr + 1;
         if (code_mem_init_addr == 5'b11111) begin
@@ -82,11 +93,10 @@ module spell_mem_internal (
         end
       end else if (!select) begin
         data_ready <= 1'b0;
-`ifdef SPELL_INTERNAL_MEM_DELAY
-        cycles <= 2'b11;
-`endif  /* SPELL_INTERNAL_MEM_DELAY */
-      end else if (cycles > 0) begin
-        cycles <= cycles - 1;
+      end else if (we && ~prev_we && ~memory_type_data) begin
+        // For code memory writes, we first need to read the 32-bit word,
+        // modify the relevant byte, and write it back.
+        data_ready <= 1'b0;
       end else begin
         data_ready <= 1'b1;
         if (write) begin
